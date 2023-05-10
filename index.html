@@ -44,24 +44,72 @@
 	}).addTo(map);
 
 
-	const marker = L.marker([43.6608423, -79.3967949]).addTo(map)
-		.bindPopup('<b>School of Cities</b>')
+	const marker = L.marker([43.66504, -79.39936]).addTo(map)
+		.bindPopup('<b>Bissell Building</b>')
         .openPopup();
+
+
+    var myStyle = {
+        "color": "black",
+        "weight": 0.5
+    };
 
     fetch("cycling-network.geojson")
     .then(function(response) {
         return response.json();
     })
     .then(function(data) {
-        L.geoJSON(data).addTo(map);
-    });    
+        L.geoJSON(data, {
+            style: myStyle,
+            onEachFeature: function (feature, layer) {
+                layer.bindPopup(
+                    feature.properties.STREET_NAME + "<br>Installed: " + feature.properties.INSTALLED
+                );
+            }
+        }).addTo(map);
+    });
 
-	// const circle = L.circle([51.508, -0.11], {
-	// 	color: 'red',
-	// 	fillColor: '#f03',
-	// 	fillOpacity: 0.5,
-	// 	radius: 500
-	// }).addTo(map).bindPopup('I am a circle.');
+    function getColor(d) {
+        console.log(d);
+        if (d === "Sheppard Subway") {
+            return '#B32078'
+        } else if (d === "Yonge-University-Spadina Subway") {
+            return '#FFCB0C'
+        } else if (d === "Spadina Subway Extension") {
+            return '#FFCB0C'
+        } else if (d === "Bloor Subway") {
+            return '#16A753'
+        } else if (d === "Scarborough RT") {
+            return '#1F99D5'
+        } else if (d === "Eglinton Crosstown LRT") {
+            return '#F87005'
+        } else {
+            return 'black'
+        }
+    }
+
+    function styleSubway(feature) {
+        return {
+            color: getColor(feature.properties.NAME),
+            weight: 14,
+        };
+    }
+
+    fetch("ttc_routes.geojson")
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        L.geoJSON(data, {style: styleSubway}
+        ).addTo(map);
+    });
+
+    L.control.scale().addTo(map);
+
+
+
+
+    // L.control.layers().addTo(map);
 
 	// const polygon = L.polygon([
 	// 	[51.509, -0.08],
